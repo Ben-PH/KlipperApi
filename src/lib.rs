@@ -1,8 +1,23 @@
 use std::collections::{HashMap, HashSet};
 pub mod objects;
 
+pub struct ApiMethod {
+    id: Option<u32>,
+    method: Method,
+}
 
-enum GcodeMethod {
+pub enum Method {
+    GCode(GCodeMethod),
+    Report(ReportMethod),
+    Obects(ObjectsMethod),
+    Info(Option<HashMap<String, String>>),
+    EStop,
+    // RegisterRemoteMethod(),
+    QueryEndstopStatus,
+}
+
+
+enum GCodeMethod {
     Help,
     Script(String),
     Restart,
@@ -21,13 +36,6 @@ enum ObjectsMethod {
     List,
     Query(HashMap<objects::StatusReferenceObjects, Vec<String>>),
     Subscribe(HashMap<objects::StatusReferenceObjects, Vec<String>>),
-}
-
-enum GenericMethod {
-    Info(Option<HashMap<String, String>>),
-    EStop,
-    // RegisterRemoteMethod(),
-    QueryEndstopStatus,
 }
 
 
