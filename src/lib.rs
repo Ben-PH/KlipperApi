@@ -1,25 +1,26 @@
 use std::{collections::{HashMap, HashSet}, fmt::Display};
 pub mod objects;
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ApiMethod {
     id: Option<u32>,
     method: Method,
 }
 
-#[derive(Debug)]
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum Method {
     GCode(GCodeMethod),
-    Report(ReportMethod),
-    Obects(ObjectsMethod),
-    Info(Option<HashMap<String, String>>),
-    EStop,
-    // RegisterRemoteMethod(),
-    QueryEndstopStatus,
+    // Report(ReportMethod),
+    // Obects(ObjectsMethod),
+    // Info(Option<HashMap<String, String>>),
+    // EStop,
+    // // RegisterRemoteMethod(),
+    // QueryEndstopStatus,
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 enum GCodeMethod {
     Help,
     Script(String),
