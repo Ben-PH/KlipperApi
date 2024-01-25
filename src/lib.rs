@@ -1,11 +1,13 @@
-use std::collections::{HashMap, HashSet};
+use std::{collections::{HashMap, HashSet}, fmt::Display};
 pub mod objects;
 
+#[derive(Debug)]
 pub struct ApiMethod {
     id: Option<u32>,
     method: Method,
 }
 
+#[derive(Debug)]
 pub enum Method {
     GCode(GCodeMethod),
     Report(ReportMethod),
@@ -17,6 +19,7 @@ pub enum Method {
 }
 
 
+#[derive(Debug)]
 enum GCodeMethod {
     Help,
     Script(String),
@@ -25,6 +28,7 @@ enum GCodeMethod {
     SubstribeOutput,
 }
 
+#[derive(Debug)]
 enum ReportMethod {
     DumpStepper,
     DumpTrapq,
@@ -32,6 +36,7 @@ enum ReportMethod {
     DumpAngle,
 }
 
+#[derive(Debug)]
 enum ObjectsMethod {
     List,
     Query(HashMap<objects::StatusReferenceObjects, Vec<String>>),
