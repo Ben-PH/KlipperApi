@@ -3,25 +3,25 @@ use std::collections::HashMap;
 use serde_json::{Value, json};
 pub mod objects;
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ApiMethod {
     pub id: Option<u32>,
     #[serde(flatten)]
     pub method: Method,
 }
 
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct JsonApiStruct {
     id: Option<u32>,
-    method: &'static str,
+    method: String,
     params: Option<Value>,
 }
 
-impl From<ApiMethod> for JsonApiStruct {
+impl<'a> From<ApiMethod> for JsonApiStruct {
     fn from(value: ApiMethod) -> Self {
         let id = value.id;
         let params = value.method.get_params();
-        Self {id, method: value.method.get_method_str(), params}
+        Self {id, method: value.method.get_method_val().to_string(), params}
     }
 }
 
@@ -29,24 +29,51 @@ impl From<ApiMethod> for JsonApiStruct {
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum Method {
     GCode(GCodeMethod),
-    // Report(ReportMethod),
-    // Obects(ObjectsMethod),
-    // Info(Option<HashMap<String, String>>),
-    // EStop,
-    // // RegisterRemoteMethod(),
-    // QueryEndstopStatus,
+    Report(ReportMethod),
+    Objects(ObjectsMethod),
+    Info(Option<HashMap<String, String>>),
+    EStop,
+    Cancel,
+    Pause,
+    Resume,
+    // RegisterRemoteMethod(),
+    QueryEndstopStatus,
 }
 impl Method {
-    fn get_method_str(&self) -> &'static str {
+    fn get_method_val(&self) -> &'static str {
         match self {
-            Method::GCode(_) => "script/gcode",
-            _ => unimplemented!()
+            Method::GCode(gcode) => match gcode {
+                GCodeMethod::Help => "gcode/help",
+                GCodeMethod::Script { .. } => "gcode/script",
+                GCodeMethod::Restart => "gcode/restart",
+                GCodeMethod::FirmwareRestart => "gcode/firmware_restart",
+                GCodeMethod::SubscribeOutput => "gcode/subscribe_output",
+            }
+            Method::Report(rep) => match rep {
+                ReportMethod::DumpStepper => "motion_report/dump_stepper",
+                ReportMethod::DumpTrapq => "motion_report/dump_trapq",
+                ReportMethod::DumpAdxl345 => "adxl345/dump_adxl345",
+                ReportMethod::DumpAngle => "angle/dump_angle",
+            }
+            Method::Objects(obj) => match obj {
+                ObjectsMethod::List => "objects/list",
+                ObjectsMethod::Query(_) => "objects/query",
+                ObjectsMethod::Subscribe(_) => "objects/subscribe",
+            }
+            Method::Info(_) => "info",
+            Method::EStop => "emergency_stop",
+            // Method::RegisterRemoteMethod => "register_remote_method",
+            Method::QueryEndstopStatus => "query_endstop_staus",
+            Method::Cancel => "pause_resume/cancel",
+            Method::Pause => "pause_resume/pause",
+            Method::Resume => "pause_resume/resume",
         }
     }
 
     fn get_params(&self) -> Option<Value> {
         match self {
             Method::GCode(GCodeMethod::Script{ script: code }) => Some(json!({ "script": code })),
+            Method::EStop => None,
             _ => unimplemented!()
         }
     }
@@ -60,7 +87,7 @@ pub enum GCodeMethod {
     Script{ script: String },
     Restart,
     FirmwareRestart,
-    SubstribeOutput,
+    SubscribeOutput,
 }
 
 #[derive(Debug)]
