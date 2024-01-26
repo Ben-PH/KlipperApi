@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum GCodeMethod {
     /// This endpoint allows one to query available G-Code commands that have a help string defined
@@ -47,7 +46,7 @@ pub enum ObjectsMethod {
 }
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum StatusMethod {
-    /// Clients are encouraged to provide the name of the client and its software version when first connecting to the Klipper API server. 
+    /// Clients are encouraged to provide the name of the client and its software version when first connecting to the Klipper API server.
     Info(Option<HashMap<String, String>>),
     /// Uused to instruct Klipper to transition to a "shutdown" state. It behaves similarly to the G-Code M112 command.
     EStop,

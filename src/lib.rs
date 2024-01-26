@@ -1,7 +1,6 @@
-
 use serde_json::{json, Value};
-pub mod objects;
 pub mod method_groups;
+pub mod objects;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ApiMethod {
@@ -29,7 +28,7 @@ impl From<ApiMethod> for JsonApiStruct {
     }
 }
 
-/// Top level method menu. 
+/// Top level method menu.
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum Method {
     GCode(method_groups::GCodeMethod),
@@ -42,7 +41,6 @@ pub enum Method {
 impl Method {
     fn get_method_val(&self) -> &'static str {
         match self {
-            
             // Method::RegisterRemoteMethod => "register_remote_method",
             Method::Objects(obj) => match obj {
                 method_groups::ObjectsMethod::List => "objects/list",
@@ -61,15 +59,15 @@ impl Method {
                 method_groups::ReportMethod::DumpTrapq => "motion_report/dump_trapq",
                 method_groups::ReportMethod::DumpAdxl345 => "adxl345/dump_adxl345",
                 method_groups::ReportMethod::DumpAngle => "angle/dump_angle",
-                method_groups::ReportMethod::QueryEndstopStatus =>  "query_endstop_staus",
+                method_groups::ReportMethod::QueryEndstopStatus => "query_endstop_staus",
             },
             Method::SetStatus(stat) => match stat {
                 method_groups::StatusMethod::Info(_) => "info",
                 method_groups::StatusMethod::EStop => "emergency_stop",
-                method_groups::StatusMethod::Cancel => "pause_resume/cancel", 
-                method_groups::StatusMethod::Pause =>  "pause_resume/pause",
+                method_groups::StatusMethod::Cancel => "pause_resume/cancel",
+                method_groups::StatusMethod::Pause => "pause_resume/pause",
                 method_groups::StatusMethod::Resume => "pause_resume/resume",
-            }
+            },
         }
     }
 
@@ -80,19 +78,23 @@ impl Method {
                 method_groups::ObjectsMethod::List => todo!(),
                 // method_groups::ObjectsMethod::Query(_) => todo!(),
                 // method_groups::ObjectsMethod::Subscribe(_) => todo!(),
-            }
+            },
             Method::GCode(inner) => match inner {
-                method_groups::GCodeMethod::Script { script: code } => Some(json!({ "script": code })),
+                method_groups::GCodeMethod::Script { script: code } => {
+                    Some(json!({ "script": code }))
+                }
                 method_groups::GCodeMethod::SubscribeOutput => todo!(),
-                method_groups::GCodeMethod::Help | method_groups::GCodeMethod::Restart | method_groups::GCodeMethod::FirmwareRestart => None,
-            }
+                method_groups::GCodeMethod::Help
+                | method_groups::GCodeMethod::Restart
+                | method_groups::GCodeMethod::FirmwareRestart => None,
+            },
             Method::Report(rep) => match rep {
                 method_groups::ReportMethod::DumpStepper => todo!(),
                 method_groups::ReportMethod::DumpTrapq => todo!(),
                 method_groups::ReportMethod::DumpAdxl345 => todo!(),
                 method_groups::ReportMethod::DumpAngle => todo!(),
                 method_groups::ReportMethod::QueryEndstopStatus => None,
-            }
+            },
             Method::SetStatus(method_groups::StatusMethod::Info(Some(map))) => {
                 if map.is_empty() {
                     return None;
@@ -101,11 +103,9 @@ impl Method {
                 // Some(json!({"client_info": {map}}))
             }
             Method::SetStatus(_) => None,
-
         }
     }
 }
-
 
 #[cfg(test)]
 mod test {
