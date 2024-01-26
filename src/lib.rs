@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 
 use serde_json::{json, Value};
 pub mod objects;
+pub mod method_groups;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct ApiMethod {
@@ -29,48 +29,47 @@ impl From<ApiMethod> for JsonApiStruct {
     }
 }
 
+/// Top level method menu. 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum Method {
-    GCode(GCodeMethod),
-    Report(ReportMethod),
-    Objects(ObjectsMethod),
-    /// Clients are encouraged to provide the name of the client and its software version when first connecting to the Klipper API server. 
-    Info(Option<HashMap<String, String>>),
-    EStop,
-    Cancel,
-    Pause,
-    Resume,
+    GCode(method_groups::GCodeMethod),
+    Report(method_groups::ReportMethod),
+    Objects(method_groups::ObjectsMethod),
+    SetStatus(method_groups::StatusMethod),
     // RegisterRemoteMethod(),
-    QueryEndstopStatus,
 }
+
 impl Method {
     fn get_method_val(&self) -> &'static str {
         match self {
-            Method::Info(_) => "info",
-            Method::EStop => "emergency_stop",
+            
             // Method::RegisterRemoteMethod => "register_remote_method",
             Method::Objects(obj) => match obj {
-                ObjectsMethod::List => "objects/list",
-                // ObjectsMethod::Query(_) => "objects/query",
-                // ObjectsMethod::Subscribe(_) => "objects/subscribe",
+                method_groups::ObjectsMethod::List => "objects/list",
+                // method_groups::ObjectsMethod::Query(_) => "objects/query",
+                // method_groups::ObjectsMethod::Subscribe(_) => "objects/subscribe",
             },
             Method::GCode(gcode) => match gcode {
-                GCodeMethod::Help => "gcode/help",
-                GCodeMethod::Script { .. } => "gcode/script",
-                GCodeMethod::Restart => "gcode/restart",
-                GCodeMethod::FirmwareRestart => "gcode/firmware_restart",
-                GCodeMethod::SubscribeOutput => "gcode/subscribe_output",
+                method_groups::GCodeMethod::Help => "gcode/help",
+                method_groups::GCodeMethod::Script { .. } => "gcode/script",
+                method_groups::GCodeMethod::Restart => "gcode/restart",
+                method_groups::GCodeMethod::FirmwareRestart => "gcode/firmware_restart",
+                method_groups::GCodeMethod::SubscribeOutput => "gcode/subscribe_output",
             },
             Method::Report(rep) => match rep {
-                ReportMethod::DumpStepper => "motion_report/dump_stepper",
-                ReportMethod::DumpTrapq => "motion_report/dump_trapq",
-                ReportMethod::DumpAdxl345 => "adxl345/dump_adxl345",
-                ReportMethod::DumpAngle => "angle/dump_angle",
+                method_groups::ReportMethod::DumpStepper => "motion_report/dump_stepper",
+                method_groups::ReportMethod::DumpTrapq => "motion_report/dump_trapq",
+                method_groups::ReportMethod::DumpAdxl345 => "adxl345/dump_adxl345",
+                method_groups::ReportMethod::DumpAngle => "angle/dump_angle",
+                method_groups::ReportMethod::QueryEndstopStatus =>  "query_endstop_staus",
             },
-            Method::Pause => "pause_resume/pause",
-            Method::Resume => "pause_resume/resume",
-            Method::Cancel => "pause_resume/cancel",
-            Method::QueryEndstopStatus => "query_endstop_staus",
+            Method::SetStatus(stat) => match stat {
+                method_groups::StatusMethod::Info(_) => "info",
+                method_groups::StatusMethod::EStop => "emergency_stop",
+                method_groups::StatusMethod::Cancel => "pause_resume/cancel", 
+                method_groups::StatusMethod::Pause =>  "pause_resume/pause",
+                method_groups::StatusMethod::Resume => "pause_resume/resume",
+            }
         }
     }
 
@@ -78,62 +77,41 @@ impl Method {
         match self {
             // Method::RegisterRemoteMethod => todo!(),
             Method::Objects(obj) => match obj {
-                ObjectsMethod::List => todo!(),
-                // ObjectsMethod::Query(_) => todo!(),
-                // ObjectsMethod::Subscribe(_) => todo!(),
+                method_groups::ObjectsMethod::List => todo!(),
+                // method_groups::ObjectsMethod::Query(_) => todo!(),
+                // method_groups::ObjectsMethod::Subscribe(_) => todo!(),
             }
             Method::GCode(inner) => match inner {
-                GCodeMethod::Script { script: code } => Some(json!({ "script": code })),
-                GCodeMethod::SubscribeOutput => todo!(),
-                GCodeMethod::Help | GCodeMethod::Restart | GCodeMethod::FirmwareRestart => None,
+                method_groups::GCodeMethod::Script { script: code } => Some(json!({ "script": code })),
+                method_groups::GCodeMethod::SubscribeOutput => todo!(),
+                method_groups::GCodeMethod::Help | method_groups::GCodeMethod::Restart | method_groups::GCodeMethod::FirmwareRestart => None,
             }
             Method::Report(rep) => match rep {
-                ReportMethod::DumpStepper => todo!(),
-                ReportMethod::DumpTrapq => todo!(),
-                ReportMethod::DumpAdxl345 => todo!(),
-                ReportMethod::DumpAngle => todo!(),
+                method_groups::ReportMethod::DumpStepper => todo!(),
+                method_groups::ReportMethod::DumpTrapq => todo!(),
+                method_groups::ReportMethod::DumpAdxl345 => todo!(),
+                method_groups::ReportMethod::DumpAngle => todo!(),
+                method_groups::ReportMethod::QueryEndstopStatus => None,
             }
-            Method::Info(Some(map)) => {
+            Method::SetStatus(method_groups::StatusMethod::Info(Some(map))) => {
                 if map.is_empty() {
                     return None;
                 }
                 todo!("info with client details not yet implemented")
                 // Some(json!({"client_info": {map}}))
             }
-            Method::Info(None) | Method::EStop | Method::Cancel | Method::Pause | Method::Resume | Method::QueryEndstopStatus  => None,
+            Method::SetStatus(_) => None,
 
         }
     }
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub enum GCodeMethod {
-    Help,
-
-    Script { script: String },
-    Restart,
-    FirmwareRestart,
-    SubscribeOutput,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub enum ReportMethod {
-    DumpStepper,
-    DumpTrapq,
-    DumpAdxl345,
-    DumpAngle,
-}
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-pub enum ObjectsMethod {
-    List,
-    // Query(HashMap<objects::StatusReferenceObjects, Vec<String>>),
-    // Subscribe(HashMap<objects::StatusReferenceObjects, Vec<String>>),
-}
 
 #[cfg(test)]
 mod test {
     use serde_json::json;
+
+    use crate::method_groups::GCodeMethod;
 
     use super::*;
     #[test]
