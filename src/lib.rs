@@ -34,6 +34,7 @@ pub enum Method {
     GCode(GCodeMethod),
     Report(ReportMethod),
     Objects(ObjectsMethod),
+    /// Clients are encouraged to provide the name of the client and its software version when first connecting to the Klipper API server. 
     Info(Option<HashMap<String, String>>),
     EStop,
     Cancel,
@@ -45,6 +46,14 @@ pub enum Method {
 impl Method {
     fn get_method_val(&self) -> &'static str {
         match self {
+            Method::Info(_) => "info",
+            Method::EStop => "emergency_stop",
+            // Method::RegisterRemoteMethod => "register_remote_method",
+            Method::Objects(obj) => match obj {
+                ObjectsMethod::List => "objects/list",
+                // ObjectsMethod::Query(_) => "objects/query",
+                // ObjectsMethod::Subscribe(_) => "objects/subscribe",
+            },
             Method::GCode(gcode) => match gcode {
                 GCodeMethod::Help => "gcode/help",
                 GCodeMethod::Script { .. } => "gcode/script",
@@ -58,41 +67,40 @@ impl Method {
                 ReportMethod::DumpAdxl345 => "adxl345/dump_adxl345",
                 ReportMethod::DumpAngle => "angle/dump_angle",
             },
-            Method::Objects(obj) => match obj {
-                ObjectsMethod::List => "objects/list",
-                // ObjectsMethod::Query(_) => "objects/query",
-                // ObjectsMethod::Subscribe(_) => "objects/subscribe",
-            },
-            Method::Info(_) => "info",
-            Method::EStop => "emergency_stop",
-            // Method::RegisterRemoteMethod => "register_remote_method",
-            Method::QueryEndstopStatus => "query_endstop_staus",
-            Method::Cancel => "pause_resume/cancel",
             Method::Pause => "pause_resume/pause",
             Method::Resume => "pause_resume/resume",
+            Method::Cancel => "pause_resume/cancel",
+            Method::QueryEndstopStatus => "query_endstop_staus",
         }
     }
 
     fn get_params(&self) -> Option<Value> {
         match self {
+            // Method::RegisterRemoteMethod => todo!(),
+            Method::Objects(obj) => match obj {
+                ObjectsMethod::List => todo!(),
+                // ObjectsMethod::Query(_) => todo!(),
+                // ObjectsMethod::Subscribe(_) => todo!(),
+            }
             Method::GCode(inner) => match inner {
                 GCodeMethod::Script { script: code } => Some(json!({ "script": code })),
-                GCodeMethod::Help | GCodeMethod::Restart | GCodeMethod::FirmwareRestart => None,
                 GCodeMethod::SubscribeOutput => todo!(),
+                GCodeMethod::Help | GCodeMethod::Restart | GCodeMethod::FirmwareRestart => None,
             }
-            Method::EStop | Method::Cancel | Method::Pause | Method::Resume | Method::QueryEndstopStatus  => None,
             Method::Report(rep) => match rep {
                 ReportMethod::DumpStepper => todo!(),
                 ReportMethod::DumpTrapq => todo!(),
                 ReportMethod::DumpAdxl345 => todo!(),
                 ReportMethod::DumpAngle => todo!(),
             }
-            Method::Objects(obj) => match obj {
-                ObjectsMethod::List => todo!(),
-                // ObjectsMethod::Query(_) => todo!(),
-                // ObjectsMethod::Subscribe(_) => todo!(),
+            Method::Info(Some(map)) => {
+                if map.is_empty() {
+                    return None;
+                }
+                todo!("info with client details not yet implemented")
+                // Some(json!({"client_info": {map}}))
             }
-            Method::Info(_map) => todo!(),
+            Method::Info(None) | Method::EStop | Method::Cancel | Method::Pause | Method::Resume | Method::QueryEndstopStatus  => None,
 
         }
     }
