@@ -1,6 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-
 #[derive(Debug)]
 pub enum StatusReferenceObjects {
     Angle,
@@ -64,7 +63,7 @@ pub struct BedScrews {
 }
 
 #[derive(Debug)]
-pub struct BedMeshProfiles{ 
+pub struct BedMeshProfiles {
     all: HashSet<String>,
     current: BedMesh,
 }
@@ -85,7 +84,6 @@ struct Configfile {
     save_config_pending_items: Vec<String>,
     warnings: Vec<ConfigWarning>,
 }
-
 
 #[derive(Debug)]
 struct ConfigWarning {
@@ -124,7 +122,7 @@ pub struct Polygon {
 // TODO: make Polygon hashable by name
 #[derive(Debug)]
 pub struct ExcludeObjects {
-    names: HashSet<String>
+    names: HashSet<String>,
 }
 
 #[derive(Debug)]
@@ -136,7 +134,7 @@ pub struct ExtruderStepper {
 
 #[derive(Debug)]
 pub struct CurrentObject {
-    name: String
+    name: String,
 }
 
 #[derive(Debug)]
@@ -164,7 +162,6 @@ pub struct FirmwareRetraction {
     unretract_extra_length: f32,
     unretract_speed: f32,
 }
-
 
 #[derive(Debug)]
 pub struct Gcode {
