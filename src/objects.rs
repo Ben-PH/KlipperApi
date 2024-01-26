@@ -77,7 +77,7 @@ pub struct BedMesh {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-struct Configfile {
+pub struct Configfile {
     settings: HashMap<String, String>,
     config: HashMap<String, String>,
     save_config_pending: bool,

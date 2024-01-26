@@ -17,7 +17,7 @@ pub struct JsonApiStruct {
     params: Option<Value>,
 }
 
-impl<'a> From<ApiMethod> for JsonApiStruct {
+impl From<ApiMethod> for JsonApiStruct {
     fn from(value: ApiMethod) -> Self {
         let id = value.id;
         let params = value.method.get_params();
@@ -92,7 +92,7 @@ impl Method {
                 // ObjectsMethod::Query(_) => todo!(),
                 // ObjectsMethod::Subscribe(_) => todo!(),
             }
-            Method::Info(map) => todo!(),
+            Method::Info(_map) => todo!(),
 
         }
     }
@@ -109,7 +109,7 @@ pub enum GCodeMethod {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-enum ReportMethod {
+pub enum ReportMethod {
     DumpStepper,
     DumpTrapq,
     DumpAdxl345,
@@ -117,7 +117,7 @@ enum ReportMethod {
 }
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
-enum ObjectsMethod {
+pub enum ObjectsMethod {
     List,
     // Query(HashMap<objects::StatusReferenceObjects, Vec<String>>),
     // Subscribe(HashMap<objects::StatusReferenceObjects, Vec<String>>),
