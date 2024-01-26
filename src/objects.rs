@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum StatusReferenceObjects {
     Angle,
     BedMesh(BedMeshProfiles),
@@ -49,12 +49,12 @@ pub enum StatusReferenceObjects {
     ZTilt(ZTilt),
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Angle {
     temp: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct BedScrews {
     is_active: bool,
     state: String,
@@ -62,12 +62,12 @@ pub struct BedScrews {
     accepted_screws: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct BedMeshProfiles {
     all: HashSet<String>,
     current: BedMesh,
 }
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct BedMesh {
     profile_name: String,
     mesh_min: f32,
@@ -76,7 +76,7 @@ pub struct BedMesh {
     mesh_matrix: (),
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct Configfile {
     settings: HashMap<String, String>,
     config: HashMap<String, String>,
@@ -85,32 +85,32 @@ struct Configfile {
     warnings: Vec<ConfigWarning>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 struct ConfigWarning {
     warning_type: String,
     message: String,
     // Additional fields if needed based on the types of warnings
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct DisplayStatus {
     progress: String,
     message: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct EndstopPhase {
     last_home: HashMap<String, EndstopHomeInfo>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct EndstopHomeInfo {
     phase: i32,
     phases: i32,
     mcu_position: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Polygon {
     coords: [[f32; 2]; 4],
     name: String,
@@ -120,42 +120,42 @@ pub struct Polygon {
 // }
 
 // TODO: make Polygon hashable by name
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ExcludeObjects {
     names: HashSet<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ExtruderStepper {
     pressure_advance: f32,
     smooth_time: f32,
     motion_queue: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct CurrentObject {
     name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Fan {
     speed: f32,
     rpm: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct FilamentSwitchSensor {
     enabled: bool,
     filament_detected: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct FilamentMotionSensor {
     enabled: bool,
     filament_detected: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct FirmwareRetraction {
     retract_length: f32,
     retract_speed: f32,
@@ -163,36 +163,36 @@ pub struct FirmwareRetraction {
     unretract_speed: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Gcode {
     commands: Vec<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GcodeButton {
     state: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GcodeMacro {
     // Assuming Gcode macros can have multiple variables with dynamic names and values
     variables: HashMap<String, String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GCodePos {
     position: Pos,
     extruder: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Pos {
     x: f32,
     y: f32,
     z: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GcodeMove {
     gcode_position: GCodePos,
     position: GCodePos,
@@ -204,7 +204,7 @@ pub struct GcodeMove {
     absolute_extrude: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Heater {
     temperature: f32,
     target: f32,
@@ -212,25 +212,25 @@ pub struct Heater {
     can_extrude: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Heaters {
     available_heaters: Vec<String>,
     available_sensors: Vec<String>,
     available_monitors: Vec<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct IdleTimeout {
     state: String,
     printing_time: f64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Led {
     color_data: Vec<[f32; 4]>, // RGBW values
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ManualProbe {
     is_active: bool,
     z_position: f32,
@@ -238,7 +238,7 @@ pub struct ManualProbe {
     z_position_upper: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Mcu {
     mcu_version: String,
     mcu_build_versions: String,
@@ -246,31 +246,31 @@ pub struct Mcu {
     last_stats: HashMap<String, String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct MotionReport {
     live_position: [f32; 4],
     live_velocity: f32,
     live_extruder_velocity: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct OutputPin {
     value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Palette2 {
     ping: f32,
     remaining_load_length: f32,
     is_splicing: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PauseResume {
     is_paused: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PrintStats {
     filename: String,
     total_duration: f64,
@@ -281,42 +281,42 @@ pub struct PrintStats {
     info: PrintInfo,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PrintInfo {
     total_layer: i32,
     current_layer: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Probe {
     name: String,
     last_query: bool,
     last_z_result: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct PwmCycleTime {
     value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct QuadGantryLevel {
     applied: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct QueryEndstops {
     last_query: HashMap<String, bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ScrewsTiltAdjust {
     error: bool,
     max_deviation: f32,
     results: HashMap<String, ScrewAdjustInfo>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ScrewAdjustInfo {
     z: f32,
     sign: String,
@@ -324,37 +324,37 @@ pub struct ScrewAdjustInfo {
     is_base: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Servo {
     value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct StepperEnable {
     steppers: HashMap<String, bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct SystemStats {
     sysload: f32,
     cputime: f32,
     memavail: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct TemperatureFan {
     temperature: f32,
     target: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct TemperatureSensor {
     temperature: f32,
     measured_min_temp: f32,
     measured_max_temp: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct TmcDrivers {
     mcu_phase_offset: Option<i32>,
     phase_offset_position: Option<f32>,
@@ -364,7 +364,7 @@ pub struct TmcDrivers {
     hold_current: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Toolhead {
     position: [f32; 4],
     extruder: String,
@@ -378,13 +378,13 @@ pub struct Toolhead {
     stalls: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct DualCarriage {
     carriage_0: String,
     carriage_1: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct VirtualSdcard {
     is_active: bool,
     progress: f32,
@@ -393,13 +393,13 @@ pub struct VirtualSdcard {
     file_size: u64,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct Webhooks {
     state: String,
     state_message: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ZThermalAdjust {
     enabled: bool,
     temperature: f32,
@@ -409,7 +409,7 @@ pub struct ZThermalAdjust {
     z_adjust_ref_temperature: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct ZTilt {
     applied: bool,
 }

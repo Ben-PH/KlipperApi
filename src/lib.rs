@@ -60,8 +60,8 @@ impl Method {
             },
             Method::Objects(obj) => match obj {
                 ObjectsMethod::List => "objects/list",
-                ObjectsMethod::Query(_) => "objects/query",
-                ObjectsMethod::Subscribe(_) => "objects/subscribe",
+                // ObjectsMethod::Query(_) => "objects/query",
+                // ObjectsMethod::Subscribe(_) => "objects/subscribe",
             },
             Method::Info(_) => "info",
             Method::EStop => "emergency_stop",
@@ -75,9 +75,25 @@ impl Method {
 
     fn get_params(&self) -> Option<Value> {
         match self {
-            Method::GCode(GCodeMethod::Script { script: code }) => Some(json!({ "script": code })),
-            Method::EStop => None,
-            _ => unimplemented!(),
+            Method::GCode(inner) => match inner {
+                GCodeMethod::Script { script: code } => Some(json!({ "script": code })),
+                GCodeMethod::Help | GCodeMethod::Restart | GCodeMethod::FirmwareRestart => None,
+                GCodeMethod::SubscribeOutput => todo!(),
+            }
+            Method::EStop | Method::Cancel | Method::Pause | Method::Resume | Method::QueryEndstopStatus  => None,
+            Method::Report(rep) => match rep {
+                ReportMethod::DumpStepper => todo!(),
+                ReportMethod::DumpTrapq => todo!(),
+                ReportMethod::DumpAdxl345 => todo!(),
+                ReportMethod::DumpAngle => todo!(),
+            }
+            Method::Objects(obj) => match obj {
+                ObjectsMethod::List => todo!(),
+                // ObjectsMethod::Query(_) => todo!(),
+                // ObjectsMethod::Subscribe(_) => todo!(),
+            }
+            Method::Info(map) => todo!(),
+
         }
     }
 }
@@ -92,7 +108,7 @@ pub enum GCodeMethod {
     SubscribeOutput,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 enum ReportMethod {
     DumpStepper,
     DumpTrapq,
@@ -100,11 +116,11 @@ enum ReportMethod {
     DumpAngle,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 enum ObjectsMethod {
     List,
-    Query(HashMap<objects::StatusReferenceObjects, Vec<String>>),
-    Subscribe(HashMap<objects::StatusReferenceObjects, Vec<String>>),
+    // Query(HashMap<objects::StatusReferenceObjects, Vec<String>>),
+    // Subscribe(HashMap<objects::StatusReferenceObjects, Vec<String>>),
 }
 
 #[cfg(test)]
